@@ -16,12 +16,12 @@ interface CustomerDao {
     suspend fun deleteCustomer(customer: Customer)
 
     @Query("SELECT * FROM customer where name = :name")
-    fun getCustomers(name:String) : List<Customer>
+    suspend fun getCustomers(name:String) : List<Customer>
 
     @Query("SELECT * FROM customer where name = :name and city = :city")
-    fun getCustomers(name:String, city:String) : List<Customer>
+    suspend fun getCustomers(name:String, city:String) : List<Customer>
 
     @Query("SELECT * FROM customer where name = :name and city = :city and State = :state")
-    fun getCustomers(name:String, city:String, state:String) : List<Customer>
+    suspend fun getCustomers(name:String, city:String, state:String) : List<Customer>
 
 }
