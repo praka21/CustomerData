@@ -6,14 +6,17 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "customer")
 data class Customer(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val name: String,
-    val ShipName: String,
-    val Address1: String,
-    val Address2:String,
-    val city:String,
-    val State:String,
-    val pincode:String,
-    val orderId: String,
-    val totalQuantity: Int
-)
+    var id: Long,
+    var name: String,
+    var ShipName: String,
+    var Address1: String,
+    var Address2:String,
+    var city:String,
+    var State:String,
+    var pincode:String,
+    var orderId: String,
+    var totalQuantity: Int,
+    var orderDate : String
+) {
+    constructor() : this(0,"","","", "","","", "", "", 0, "")
+}

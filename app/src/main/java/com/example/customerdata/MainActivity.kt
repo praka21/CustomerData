@@ -38,10 +38,7 @@ class MainActivity : AppCompatActivity() {
             else tab.text = "Result"
         }.attach()
 
-        GlobalScope.launch {
-            database.customerDao().insertCustomer(Customer(0,"Prateek", "Sahil"
-                , "null", "null", "Panipat", "Haryana","132","124567", 5))
-        }
+
 
 
 
