@@ -61,7 +61,10 @@ class UploadFragment : Fragment() {
         }
 
         submit.setOnClickListener{
-            uploadCSVData()
+            GlobalScope.launch {
+                uploadCSVData()
+            }
+
         }
         return root
     }
@@ -77,7 +80,7 @@ class UploadFragment : Fragment() {
     }
 
 
-    private fun uploadCSVData(){
+    private suspend fun uploadCSVData(){
 
         if(myFileUri == null) {
             Toast.makeText(this.context, "Please Select file !!", Toast.LENGTH_SHORT).show()
@@ -97,7 +100,6 @@ class UploadFragment : Fragment() {
             for(row in sheet) {
 
                 if(row.rowNum > 0) {
-                    var colnumber = 0
                     val cellIterator : Iterator<Cell> = row.cellIterator()
 
                     var customer = Customer()
@@ -114,43 +116,37 @@ class UploadFragment : Fragment() {
                             22 -> customer.Address2 = cell.toString().trim()
                             23 -> customer.city = cell.toString().trim()
                             24 -> customer.State = cell.toString().trim()
-                            25 -> customer.pincode = cell.toString().trim()
+                            25 -> customer.pincode = cell.toString().toFloat().toInt().toString().trim()
 
                         }
                         count ++
 
                     }
                     CoroutineScope(Dispatchers.IO).launch {
-
                         val searchResult = database.customerDao().isCustomerPresent(customer.ShipName, customer.city, customer.State, customer.Address1, customer.Address2)
-
-                        Log.e("Prateek", " search result  size is "+ searchResult.size)
-
                         if ( searchResult != null && searchResult.size > 0) {
 
-                            Log.e("Prateek", " search result id"+ searchResult.get(0).id)
                             val found = database.customerDao().getCustomer(searchResult.get(0).id)
-
                             database.customerDao().updateCustomer(found.id,found.orderId + ", "+ customer.orderId, found.totalQuantity + customer.totalQuantity,
                                 customer.orderDate)
-                            Log.e("Prateek", " update operation successfull")
 
                         } else {
-                            Log.e("Prateek", " insert operation ")
-                            val job = database.customerDao().insertCustomer(customer)
-
-                            Log.e("Prateek", " insert operation successfull")
+                            database.customerDao().insertCustomer(customer)
                         }
-                    }
+                    }.join()
 
                 }
             }
         } catch (ex : Exception) {
             Log.e("Prateek"," Exception caught" + ex)
-            Toast.makeText(this.context, "Not imported", Toast.LENGTH_LONG).show()
+            requireActivity().runOnUiThread(Runnable {
+                Toast.makeText(this.context, "Not imported", Toast.LENGTH_LONG).show()
+            })
             return
         }
-        Toast.makeText(this.context, "Imported Successfully", Toast.LENGTH_LONG).show()
+        requireActivity().runOnUiThread(Runnable {
+            Toast.makeText(this.context, "Imported Successfully", Toast.LENGTH_LONG).show()
+        })
     }
 
 
