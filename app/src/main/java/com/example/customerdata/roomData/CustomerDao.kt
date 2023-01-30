@@ -6,7 +6,6 @@ import androidx.room.*
 @Dao
 interface CustomerDao {
 
-    @Transaction
     @Insert
     fun insertCustomer(customer: Customer)
 
@@ -28,7 +27,6 @@ interface CustomerDao {
     @Query("SELECT * FROM customer WHERE id = :id")
     fun getCustomer(id: Long): Customer
 
-    @Transaction
     @Query("SELECT * FROM customer WHERE ShipName LIKE :name and city LIKE :city and State LIKE :state and Address1 LIKE :adr1 and Address2 LIKE :adr2")
     fun isCustomerPresent(
         name: String,
