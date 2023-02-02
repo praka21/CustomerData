@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.FileUtils
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +14,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.example.customerdata.CustomerModel.CustomerViewModel
 import com.example.customerdata.FIleUtil
 import com.example.customerdata.R
 import com.example.customerdata.roomData.Customer
@@ -22,10 +23,8 @@ import com.example.customerdata.roomData.CustomerDatabase
 import kotlinx.coroutines.*
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
-import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
-import kotlin.math.roundToInt
 
 
 class UploadFragment : Fragment() {
@@ -35,13 +34,20 @@ class UploadFragment : Fragment() {
     private lateinit var browseButton : Button
     private lateinit var myPath : EditText
     private lateinit var submit : Button
+    private lateinit var result : Button
+    private lateinit var viewModel: CustomerViewModel
     private lateinit var database: CustomerDatabase
+    private lateinit var resultList: MutableList<Customer>
+    private lateinit var callMain : switchInterface
 
 
     private var myFileUri : Uri? = null
 
     override fun onAttach(context: Context) {
         database = CustomerDatabase.getDatabase(context)
+        if(context is switchInterface) {
+            callMain = context
+        }
         super.onAttach(context)
     }
 
@@ -55,17 +61,35 @@ class UploadFragment : Fragment() {
         myPath = root.findViewById(R.id.selectedString)
         browseButton = root.findViewById(R.id.select)
         submit = root.findViewById(R.id.submit_data)
+        result = root.findViewById(R.id.result_common)
 
+        viewModel = ViewModelProvider(requireActivity()).get(CustomerViewModel::class.java)
+
+        myPath.setText("")
+        myFileUri = null
         browseButton.setOnClickListener{
             doBrowseFile();
         }
 
         submit.setOnClickListener{
             GlobalScope.launch {
-                uploadCSVData()
+                var output = uploadCSVData()
+                requireActivity().runOnUiThread(Runnable {
+                    result.visibility = View.VISIBLE
+                    result.setText("" + resultList.size +" repeated Customers found")
+                })
+
             }
 
         }
+
+        result.setOnClickListener{
+            viewModel.result = resultList
+            callMain.switchtoTabResult()
+        }
+
+
+
         return root
     }
 
@@ -80,11 +104,14 @@ class UploadFragment : Fragment() {
     }
 
 
-    private suspend fun uploadCSVData(){
+    private suspend fun uploadCSVData(): Boolean {
 
         if(myFileUri == null) {
-            Toast.makeText(this.context, "Please Select file !!", Toast.LENGTH_SHORT).show()
-            return
+            requireActivity().runOnUiThread(Runnable {
+                Toast.makeText(this.context, "Please Select file !!", Toast.LENGTH_SHORT).show()
+            })
+
+            return false
         }
 
         try {
@@ -96,6 +123,8 @@ class UploadFragment : Fragment() {
 
             val workbook = HSSFWorkbook(fileInputStream)
             val sheet = workbook.getSheetAt(0)
+
+            resultList = mutableListOf()
 
             for(row in sheet) {
 
@@ -129,6 +158,7 @@ class UploadFragment : Fragment() {
                             val found = database.customerDao().getCustomer(searchResult.get(0).id)
                             database.customerDao().updateCustomer(found.id,found.orderId + ", "+ customer.orderId, found.totalQuantity + customer.totalQuantity,
                                 customer.orderDate)
+                            resultList.add(customer)
 
                         } else {
                             database.customerDao().insertCustomer(customer)
@@ -138,15 +168,16 @@ class UploadFragment : Fragment() {
                 }
             }
         } catch (ex : Exception) {
-            Log.e("Prateek"," Exception caught" + ex)
+            Log.e("Prateek", "Exception caught$ex")
             requireActivity().runOnUiThread(Runnable {
-                Toast.makeText(this.context, "Not imported", Toast.LENGTH_LONG).show()
+                Toast.makeText(this.context, "Error while Importing !!!!!", Toast.LENGTH_LONG).show()
             })
-            return
+            return false
         }
         requireActivity().runOnUiThread(Runnable {
             Toast.makeText(this.context, "Imported Successfully", Toast.LENGTH_LONG).show()
         })
+        return true
     }
 
 

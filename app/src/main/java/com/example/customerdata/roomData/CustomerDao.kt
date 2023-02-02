@@ -1,6 +1,5 @@
 package com.example.customerdata.roomData
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -15,13 +14,13 @@ interface CustomerDao {
     @Delete
     suspend fun deleteCustomer(customer: Customer)
 
-    @Query("SELECT * FROM customer where name LIKE :name")
+    @Query("SELECT * FROM customer where UPPER(name) LIKE '%' || :name || '%'")
     suspend fun getCustomers(name: String): List<Customer>
 
-    @Query("SELECT * FROM customer where name = :name and city = :city")
+    @Query("SELECT * FROM customer where UPPER(name) like '%' || :name || '%' and UPPER(city) like :city")
     suspend fun getCustomers(name: String, city: String): List<Customer>
 
-    @Query("SELECT * FROM customer where name = :name and city = :city and State = :state")
+    @Query("SELECT * FROM customer where UPPER(name) like '%' || :name || '%' and UPPER(city) like :city and UPPER(State) like :state")
     suspend fun getCustomers(name: String, city: String, state: String): List<Customer>
 
     @Query("SELECT * FROM customer WHERE id = :id")

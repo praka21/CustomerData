@@ -10,6 +10,8 @@ abstract class CustomerDatabase : RoomDatabase() {
 
     abstract fun customerDao() : CustomerDao
 
+    abstract fun stateDao() : StateListDao
+
     companion object{
         @Volatile
         private var Instance : CustomerDatabase? = null
