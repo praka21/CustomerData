@@ -1,4 +1,4 @@
-package com.example.customerdata;
+package com.example.customerdata.Utils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;

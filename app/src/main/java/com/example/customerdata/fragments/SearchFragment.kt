@@ -28,7 +28,7 @@ class SearchFragment : Fragment() {
     private lateinit var switchInterface: switchInterface
 
     private lateinit var result_view : TextView
-    private var resultList : List<Customer>? = null
+    private var resultList : MutableList<Customer> = mutableListOf()
 
     private lateinit var stateList : MutableList<String>
     private lateinit var cityList : MutableList<String>
@@ -101,19 +101,19 @@ class SearchFragment : Fragment() {
                 resultList = database.customerDao().getCustomers(nameToSearch.uppercase())
             }.join()
 
-            output = "" + (resultList?.size ?: 0) + " record found"
+            output = "" + resultList?.size + " record found"
 
         } else {
             val job = GlobalScope.launch {
                 resultList = database.customerDao().getCustomers(nameToSearch.uppercase(), cityToSearch.uppercase(), stateToSearch.uppercase())
             }.join()
-            output = " " + (resultList?.size ?: 0) + " record found"
+            output = " " + resultList.size + " record found"
         }
 
 
 
         requireActivity().runOnUiThread(Runnable {
-            result_view.text = "" + (resultList?.size ?: 0) + " record found"
+            result_view.text = "" + resultList.size + " record found"
             result_view.visibility = View.VISIBLE
             Toast.makeText(context, output, Toast.LENGTH_LONG).show()
         })

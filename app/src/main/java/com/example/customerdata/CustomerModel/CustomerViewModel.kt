@@ -6,6 +6,6 @@ import com.example.customerdata.roomData.Customer
 import com.example.customerdata.roomData.CustomerDatabase
 
 class CustomerViewModel : ViewModel() {
-    var result: List<Customer>? = null
+    var result: MutableList<Customer> = mutableListOf()
 
 }

@@ -15,13 +15,13 @@ interface CustomerDao {
     suspend fun deleteCustomer(customer: Customer)
 
     @Query("SELECT * FROM customer where UPPER(name) LIKE '%' || :name || '%'")
-    suspend fun getCustomers(name: String): List<Customer>
+    suspend fun getCustomers(name: String): MutableList<Customer>
 
     @Query("SELECT * FROM customer where UPPER(name) like '%' || :name || '%' and UPPER(city) like :city")
-    suspend fun getCustomers(name: String, city: String): List<Customer>
+    suspend fun getCustomers(name: String, city: String): MutableList<Customer>
 
     @Query("SELECT * FROM customer where UPPER(name) like '%' || :name || '%' and UPPER(city) like :city and UPPER(State) like :state")
-    suspend fun getCustomers(name: String, city: String, state: String): List<Customer>
+    suspend fun getCustomers(name: String, city: String, state: String): MutableList<Customer>
 
     @Query("SELECT * FROM customer WHERE id = :id")
     fun getCustomer(id: Long): Customer

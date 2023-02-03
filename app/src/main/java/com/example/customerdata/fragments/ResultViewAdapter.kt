@@ -13,10 +13,10 @@ import com.example.customerdata.roomData.Customer
 
 class ResultViewAdapter: RecyclerView.Adapter<ResultViewAdapter.ViewHelper> {
 
-    private var data : MutableList<Customer>?
+    private var data : MutableList<Customer>
 
-    constructor(data : List<Customer>?) {
-        this.data = data as MutableList<Customer>?
+    constructor(data : MutableList<Customer>) {
+        this.data = data
 
     }
 
@@ -27,9 +27,9 @@ class ResultViewAdapter: RecyclerView.Adapter<ResultViewAdapter.ViewHelper> {
         var orderid =itemView.findViewById<TextView>(R.id.itemOrders)
     }
 
-    fun setData(newList : List<Customer>?) {
-        data = newList as MutableList<Customer>?
-        Log.e("Prateek", "added element "+ (data?.size ?: 0))
+    fun setData(newList : MutableList<Customer>) {
+        data = newList
+        Log.e("Prateek", "added element "+ data.size)
         notifyDataSetChanged()
     }
 
@@ -39,14 +39,14 @@ class ResultViewAdapter: RecyclerView.Adapter<ResultViewAdapter.ViewHelper> {
     }
 
     override fun getItemCount(): Int {
-        return data?.size ?: 0
+        return data.size
     }
 
     override fun onBindViewHolder(holder: ViewHelper, position: Int) {
-        holder.name.text = data!!.get(position).ShipName
-        holder.address.text = data!!.get(position).Address1 + ", "+ data!!.get(position).Address2
-        holder.citystate.text = data!!.get(position).city + ", " + data!!.get(position).State
-        holder.orderid.text = data!!.get(position).orderId
+        holder.name.text = data.get(position).ShipName
+        holder.address.text = data.get(position).Address1 + ", "+ data.get(position).Address2
+        holder.citystate.text = data.get(position).city + ", " + data.get(position).State
+        holder.orderid.text = data.get(position).orderId
     }
 
 
